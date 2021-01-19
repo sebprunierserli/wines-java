@@ -1,7 +1,5 @@
-package org.example.csv;
+package org.example.database;
 
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -13,37 +11,58 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.example.csv.beans.Wine;
+import org.example.database.beans.Wine;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Import {
+public class ImportFromDatabase {
 
-    private static final String CSV_FILE_NAME = "/vins.csv";
+    private static final String SQL_FILE_NAME = "/vins.sql";
 
-    public static final String ES_HOSTNAME = "localhost";
-    public static final int ES_PORT = 9200;
-    public static final String ES_SCHEME = "http";
-    private static final String ES_INDEX_NAME = "my-wines";
+    private static final String ES_HOSTNAME = "localhost";
+    private static final int ES_PORT = 9200;
+    private static final String ES_SCHEME = "http";
+    private static final String ES_INDEX_NAME = "my-wines-2";
     private static final Integer ES_BULK_SIZE = 100;
 
     public static void main(String[] args) {
+        Connection dbConnection = null;
         RestHighLevelClient esClient = null;
-
         try {
-            // Get wines from CSV file
-            InputStream csvStream = Import.class.getResourceAsStream(CSV_FILE_NAME);
-            CsvToBean<Wine> csvToBean = new CsvToBeanBuilder<Wine>(new InputStreamReader(csvStream))
-                    .withSeparator(',')
-                    .withType(Wine.class)
-                    .build();
-            List<Wine> wines = csvToBean.parse();
+            // Create database connection (hsqldb)
+            Class.forName("org.hsqldb.jdbc.JDBCDriver");
+            dbConnection = DriverManager.getConnection("jdbc:hsqldb:mem:winesdb", "SA", "");
+
+            // Insert Wines into database
+            List<String> sqlLines = Files.readAllLines(Paths.get(ImportFromDatabase.class.getResource(SQL_FILE_NAME).toURI()));
+            for (String sqlLine : sqlLines) {
+                if (!sqlLine.startsWith("--")) {
+                    Statement st = dbConnection.createStatement();
+                    st.execute(sqlLine);
+                }
+            }
+
+            // Get all wines from database
+            List<Wine> wines = new ArrayList<>();
+            ResultSet rs = dbConnection.createStatement().executeQuery("SELECT nom, couleur, region, appellation, millesime, pays FROM Wines");
+            while (rs.next()) {
+                Wine wine = new Wine();
+                wine.setNom(rs.getString("nom"));
+                wine.setCouleur(rs.getString("couleur"));
+                wine.setRegion(rs.getString("region"));
+                wine.setAppellation(rs.getString("appellation"));
+                wine.setMillesime(rs.getString("millesime"));
+                wine.setPays(rs.getString("pays"));
+                wines.add(wine);
+            }
 
             // Prepare wines chunks
             AtomicInteger counter = new AtomicInteger();
@@ -72,7 +91,7 @@ public class Import {
                 });
                 BulkResponse bulkResponse = esClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                 System.out.println("Bulk status: " + bulkResponse.status().getStatus());
-                if(bulkResponse.hasFailures()) {
+                if (bulkResponse.hasFailures()) {
                     System.err.println(bulkResponse.buildFailureMessage());
                 } else {
                     System.out.println(bulkResponse.getItems().length + " wines inserted!");
@@ -83,6 +102,13 @@ public class Import {
             e.printStackTrace();
             System.exit(1);
         } finally {
+            if (dbConnection != null) {
+                try {
+                    dbConnection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
             if (esClient != null) {
                 try {
                     esClient.close();

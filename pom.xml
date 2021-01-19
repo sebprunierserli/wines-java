@@ -29,6 +29,17 @@
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.10.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.14.0</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
 </project>

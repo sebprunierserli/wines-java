@@ -1,4 +1,4 @@
-package org.example.beans;
+package org.example.csv.beans;
 
 import com.google.gson.Gson;
 import com.opencsv.bean.CsvBindByName;

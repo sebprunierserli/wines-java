@@ -1,4 +1,4 @@
-package org.example;
+package org.example.csv;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -13,7 +13,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.example.beans.Wine;
+import org.example.csv.beans.Wine;
 
 import java.io.IOException;
 import java.io.InputStream;

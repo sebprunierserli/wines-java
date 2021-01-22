@@ -64,11 +64,8 @@ public class ImportFromCSVWithAlias {
             GetAliasesRequest getAliasRequest = new GetAliasesRequest();
             getAliasRequest.aliases(ES_INDEX_ALIAS_NAME);
             GetAliasesResponse getAliasResponse = esClient.indices().getAlias(getAliasRequest, RequestOptions.DEFAULT);
-            if (getAliasResponse.status().getStatus() != 200) {
-                System.err.println("Cannot retrieve old indexes names");
-                System.exit(1);
-            }
             Set<String> oldIndexes = getAliasResponse.getAliases().keySet();
+            System.out.println("Old indexes : " + oldIndexes);
 
             // Insert chunks into Elasticsearch with Bulk API
             boolean insertOk = true;

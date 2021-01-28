@@ -1,4 +1,4 @@
-package org.example.mics.picocli;
+package org.example.misc.picocli;
 
 import picocli.CommandLine;
 

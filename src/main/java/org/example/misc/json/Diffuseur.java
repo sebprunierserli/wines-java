@@ -1,4 +1,4 @@
-package org.example.mics.json;
+package org.example.misc.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

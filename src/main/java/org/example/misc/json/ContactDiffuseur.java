@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class Diffuseur {
+public class ContactDiffuseur {
 
     private String nom;
     private String prenom;
@@ -76,14 +76,14 @@ public class Diffuseur {
     }
 
     public static void main(String[] args) {
-        Diffuseur diffuseur = new Diffuseur();
-        diffuseur.setNom("PRUNIER");
-        diffuseur.setPrenom("Sébastien");
-        diffuseur.setFonction("Développeur");
+        ContactDiffuseur contactDiffuseur = new ContactDiffuseur();
+        contactDiffuseur.setNom("PRUNIER");
+        contactDiffuseur.setPrenom("Sébastien");
+        contactDiffuseur.setFonction("Développeur");
         //diffuseur.setMail("sebastien@me.com");
         //diffuseur.setTelephone("0000000000");
 
-        System.out.println(diffuseur.toJson());
+        System.out.println(contactDiffuseur.toJson());
     }
 
 }

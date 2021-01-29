@@ -10,6 +10,9 @@ public class Configuration {
     private static final String DEFAULT_ELASTICSEARCH_URL = "http://localhost:9200";
     private static final String DEFAULT_ELASTICSEARCH_BULK_SIZE = "500";
 
+    @CommandLine.Option(names = { "-d", "--data" }, description = "data type (valid values: ${COMPLETION-CANDIDATES})", required = true)
+    private DataType dataType;
+
     @CommandLine.Option(names = { "-dbHost", "--databaseHost" }, description = "database host (default: ${DEFAULT-VALUE})", defaultValue = DEFAULT_DATABASE_HOST)
     private String databaseHost;
 
@@ -27,6 +30,14 @@ public class Configuration {
 
     @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
     private boolean helpRequested = false;
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
 
     public String getDatabaseHost() {
         return databaseHost;
